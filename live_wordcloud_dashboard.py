@@ -13,24 +13,26 @@ def get_google_sheet_data():
 # Streamlit UI
 st.title("Live Word Cloud from Survey Responses")
 
+placeholder = st.empty()  # Placeholder for dynamic content
+
 while True:
     try:
         df = get_google_sheet_data()
         if not df.empty:
             text_data = " ".join(df[df.columns[-1]].dropna())  # Assuming last column has responses
             
-            # Clear previous word cloud
-            st.empty()
-            
             # Generate Word Cloud
             wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text_data)
             fig, ax = plt.subplots(figsize=(10, 5))
             ax.imshow(wordcloud, interpolation='bilinear')
             ax.axis("off")
-            st.pyplot(fig)
+            
+            # Update the placeholder with the new word cloud
+            with placeholder.container():
+                st.pyplot(fig)
         else:
-            st.write("Waiting for responses...")
+            placeholder.write("Waiting for responses...")
         
         time.sleep(10)  # Refresh every 10 seconds
     except Exception as e:
-        st.error(f"Error fetching data: {e}")
+        placeholder.error(f"Error fetching data: {e}")
