@@ -22,8 +22,8 @@ while True:
             text_data_list = df[df.columns[-1]].dropna().tolist()  # Get list of responses
             combined_text = " ".join(text_data_list)  # Join responses into a single string
             
-            # Generate Word Cloud
-            wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_text)
+            # Generate Word Cloud with phrases preserved
+            wordcloud = WordCloud(width=800, height=400, background_color='white', collocations=False).generate(combined_text)
             fig, ax = plt.subplots(figsize=(10, 5))
             ax.imshow(wordcloud, interpolation='bilinear')
             ax.axis("off")
