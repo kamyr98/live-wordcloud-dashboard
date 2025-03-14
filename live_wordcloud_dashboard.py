@@ -19,8 +19,10 @@ def generate_colored_wordcloud(responses):
     def color_func(word, **kwargs):
         return random.choice(color_choices)  # Assign random colors to responses
     
-    wordcloud = WordCloud(width=800, height=400, background_color='white', 
-                          colormap=None, color_func=color_func, collocations=False)
+    wordcloud = WordCloud(width=1200, height=600, background_color='white', 
+                          colormap=None, color_func=color_func, collocations=False,
+                          prefer_horizontal=0.5, max_words=len(responses),
+                          min_font_size=10, max_font_size=200)
     wordcloud.generate_from_frequencies(word_frequencies)
     return wordcloud
 
@@ -35,10 +37,10 @@ while True:
         if not df.empty:
             responses = df[df.columns[-1]].dropna().tolist()  # Collect all responses
             
-            # Generate Word Cloud with varied colors and random positioning
+            # Generate Word Cloud with varied colors, random positioning, and vertical words
             wordcloud = generate_colored_wordcloud(responses)
             
-            fig, ax = plt.subplots(figsize=(10, 5))
+            fig, ax = plt.subplots(figsize=(12, 6))
             ax.imshow(wordcloud, interpolation='bilinear')
             ax.axis("off")
             
