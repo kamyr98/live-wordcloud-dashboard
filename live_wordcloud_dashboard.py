@@ -19,17 +19,21 @@ while True:
     try:
         df = get_google_sheet_data()
         if not df.empty:
-            text_data = " ".join(df[df.columns[-1]].dropna())  # Assuming last column has responses
+            text_data_list = df[df.columns[-1]].dropna().tolist()  # Get list of responses
+            combined_text = "\n".join(text_data_list)  # Join responses with line breaks
             
             # Generate Word Cloud
-            wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text_data)
+            wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_text)
             fig, ax = plt.subplots(figsize=(10, 5))
             ax.imshow(wordcloud, interpolation='bilinear')
             ax.axis("off")
             
-            # Update the placeholder with the new word cloud
+            # Update the placeholder with the new word cloud and show all responses
             with placeholder.container():
                 st.pyplot(fig)
+                st.write("### Responses:")
+                for response in text_data_list:
+                    st.write(f"- {response}")
         else:
             placeholder.write("Waiting for responses...")
         
