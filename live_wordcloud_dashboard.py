@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
+import random
 import time
 
 # Function to fetch data from Google Sheets
@@ -9,6 +10,19 @@ import time
 def get_google_sheet_data():
     sheet_url = "https://docs.google.com/spreadsheets/d/1NsxHZpkMTPczAGh0yCrrAoE-rlmpSKfbuL8gTblBeRg/gviz/tq?tqx=out:csv&gid=0"
     return pd.read_csv(sheet_url)
+
+# Function to generate a word cloud with different colors for each response
+def generate_colored_wordcloud(responses):
+    color_choices = ["red", "blue", "green", "purple", "orange", "pink", "brown", "gray"]
+    word_frequencies = {response: random.randint(1, 10) for response in responses}  # Random sizes for visualization
+    
+    def color_func(word, **kwargs):
+        return random.choice(color_choices)  # Assign random colors to responses
+    
+    wordcloud = WordCloud(width=800, height=400, background_color='white', 
+                          colormap=None, color_func=color_func, collocations=False)
+    wordcloud.generate_from_frequencies(word_frequencies)
+    return wordcloud
 
 # Streamlit UI
 st.title("Live Word Cloud from Survey Responses")
@@ -19,17 +33,18 @@ while True:
     try:
         df = get_google_sheet_data()
         if not df.empty:
-            for response in df[df.columns[-1]].dropna():  # Iterate through each response
-                
-                # Generate Word Cloud for each response separately
-                wordcloud = WordCloud(width=800, height=400, background_color='white', collocations=False).generate(response)
-                fig, ax = plt.subplots(figsize=(10, 5))
-                ax.imshow(wordcloud, interpolation='bilinear')
-                ax.axis("off")
-                
-                # Update the placeholder with the new word cloud
-                with placeholder.container():
-                    st.pyplot(fig)
+            responses = df[df.columns[-1]].dropna().tolist()  # Collect all responses
+            
+            # Generate Word Cloud with varied colors and random positioning
+            wordcloud = generate_colored_wordcloud(responses)
+            
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.imshow(wordcloud, interpolation='bilinear')
+            ax.axis("off")
+            
+            # Update the placeholder with the new word cloud
+            with placeholder.container():
+                st.pyplot(fig)
         else:
             placeholder.write("Waiting for responses...")
         
